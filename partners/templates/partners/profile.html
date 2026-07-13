@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Профиль компании{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="profile-header">
+        <h1 class="profile-title">Профиль компании</h1>
+        <div class="profile-actions">
+            <a href="{% url 'partner_profile_edit' %}" class="btn btn-primary">
+                <span class="btn-icon">✏️</span> Редактировать</a>
+            <a href="{% url 'partner_profile_delete' %}" class="btn btn-danger">
+                <span class="btn-icon">🗑️</span> Удалить профиль</a>
+        </div>
+    </div>
+
+    <!-- Карточка профиля -->
+    <div class="card profile-card">
+        <div class="profile-logo-wrapper">
+            {% if profile.logo %}
+                <img src="{{ profile.logo.url }}" alt="Логотип" class="profile-logo">
+            {% else %}
+                <div class="profile-logo-placeholder">
+                    <span>^-^</span>
+                </div>
+            {% endif %}
+        </div>
+
+        <h2 class="profile-company-name">{{ profile.company_name }}</h2>
+        <p class="profile-fullname">{{ profile.user.get_full_name|default:profile.user.username }}</p>
+        <p class="profile-email">{{ profile.user.email }}</p>
+
+        {% if profile.is_verified %}
+            <span class="verified-badge">✓ Верифицирован</span>
+        {% endif %}
+    </div>
+
+    <!-- Информация о компании -->
+    <div class="card info-card">
+        <h3 class="card-title">
+            <span class="card-title-icon">📋</span>
+            Информация о компании
+        </h3>
+
+        <div class="info-grid">
+            <div class="info-item">
+                <label class="info-label">Должность:</label>
+                <p class="info-value">{{ profile.position|default:"Не указана" }}</p>
+            </div>
+
+            <div class="info-item">
+                <label class="info-label">Телефон:</label>
+                <p class="info-value">{{ profile.phone|default:"Не указан" }}</p>
+            </div>
+
+            <div class="info-item">
+                <label class="info-label">Сайт:</label>
+                {% if profile.website %}
+                    <a href="{{ profile.website }}" target="_blank" class="info-link">{{ profile.website }}</a>
+                {% else %}
+                    <p class="info-value">Не указан</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Управление проектами -->
+    <div class="card actions-card">
+        <h3 class="card-title">
+            <span class="card-title-icon">🚀</span>
+            Управление проектами
+        </h3>
+        <div class="actions-group">
+            <a href="{% url 'partner_projects' %}" class="btn btn-primary">
+                <span class="btn-icon">📋</span> Мои проекты
+            </a>
+            <a href="{% url 'project_create' %}" class="btn btn-secondary">
+                <span class="btn-icon">➕</span> Создать проект
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

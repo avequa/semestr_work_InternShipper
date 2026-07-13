@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Заявки на проект {{ project.title }}{% endblock %}
+
+{% block content %}
+<div class="applications-container">
+    <div class="applications-header">
+        <div>
+            <a href="{% url 'partner_projects' %}" class="back-link">← Назад к проектам</a>
+            <h1 class="applications-title">Заявки на проект</h1>
+            <h2 class="applications-subtitle">{{ project.title }}</h2>
+        </div>
+        <div>
+            <span class="status-badge status-{{ project.is_active|yesno:'active,inactive' }}">
+                {{ project.is_active|yesno:"Активен,Неактивен" }}
+            </span>
+        </div>
+    </div>
+
+    <div class="card project-summary">
+        <div class="summary-item">
+            <strong>Дедлайн:</strong> {{ project.deadline|date:"d.m.Y" }}
+        </div>
+        <div class="summary-item">
+            <strong>Макс. участников:</strong> {{ project.max_team_members }}
+        </div>
+        <div class="summary-item summary-full">
+            <strong>Описание:</strong> {{ project.description }}
+        </div>
+        {% if project.requirements %}
+            <div class="summary-item summary-full">
+                <strong>Требования:</strong> {{ project.requirements }}
+            </div>
+        {% endif %}
+    </div>
+
+    {% if applications %}
+        <div class="applications-list">
+            {% for application in applications %}
+                <div class="card application-item">
+                    <div class="application-header">
+                        <div>
+                            <h3 class="application-team">Команда #{{ application.team.id }}</h3>
+                            <p class="application-date">
+                                Подана: {{ application.created_at|date:"d.m.Y H:i" }}
+                            </p>
+                        </div>
+                        <div>
+                            <span class="status-badge status-{{ application.status }}">
+                                {{ application.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+
+                    {% if application.message %}
+                        <div class="application-message">
+                            {{ application.message }}
+                        </div>
+                    {% endif %}
+
+                    <div class="application-actions">
+                        <form method="post" action="{% url 'update_application_status' project.pk application.pk %}" class="status-form">
+                            {% csrf_token %}
+                            {% if application.status == 'pending' %}
+                                <button type="submit" name="status" value="approved" class="btn btn-success btn-small">
+                                    ✓ Одобрить
+                                </button>
+                                <button type="submit" name="status" value="rejected" class="btn btn-danger btn-small">
+                                    ✗ Отклонить
+                                </button>
+                            {% elif application.status == 'approved' %}
+                                <button type="submit" name="status" value="rejected" class="btn btn-danger btn-small">
+                                    ✗ Отменить одобрение
+                                </button>
+                            {% elif application.status == 'rejected' %}
+                                <button type="submit" name="status" value="approved" class="btn btn-success btn-small">
+                                    ✓ Одобрить
+                                </button>
+                            {% endif %}
+                            <button type="submit" name="status" value="pending" class="btn btn-outline btn-small">
+                                ⟳ На рассмотрение
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card empty-state">
+            <div class="empty-icon">📭</div>
+            <h3 class="empty-title">Нет заявок</h3>
+            <p class="empty-text">На этот проект пока никто не подал заявку</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

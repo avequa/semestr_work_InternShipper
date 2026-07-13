@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Добавить участника — {{ team.name }}{% endblock %}
+
+{% block content %}
+<div class="team-form-container">
+    <div class="team-form-header">
+        <h1 class="team-form-title">Добавить участника</h1>
+        <p class="team-form-subtitle">Команда: {{ team.name }}</p>
+    </div>
+
+    <div class="card team-form-card">
+        <form method="post" class="team-form">
+            {% csrf_token %}
+
+            <div class="team-form-group">
+                <label for="email">Email студента</label>
+                <input type="email" name="email" id="email" required class="team-input" placeholder="student@example.com">
+                <small class="team-field-hint">Введите email, который студент использовал при регистрации</small>
+            </div>
+
+            <div class="team-form-actions">
+                <button type="submit" class="btn btn-primary btn-large">
+                    <span class="btn-icon">➕</span> Добавить
+                </button>
+                <a href="{% url 'teams:my_team' %}" class="btn btn-outline">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

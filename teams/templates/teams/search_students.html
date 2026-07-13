@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Поиск студентов — {{ team.name }}{% endblock %}
+
+{% block content %}
+<div class="team-search-container">
+    <div class="team-search-header">
+        <div>
+            <a href="{% url 'teams:my_team' %}" class="back-link">← Назад к команде</a>
+            <h1 class="team-search-title">Поиск студентов</h1>
+            <p class="team-search-subtitle">Команда: {{ team.name }}</p>
+        </div>
+    </div>
+
+    <div class="card team-search-form-card">
+        <form method="get" action="{% url 'teams:search_students' team.id %}" class="team-search-form">
+            <div class="team-search-input-wrapper">
+                <input type="text"
+                       name="q"
+                       value="{{ query }}"
+                       placeholder="Введите имя, фамилию или username..."
+                       class="team-search-input">
+                <button type="submit" class="btn btn-primary">
+                    <span class="btn-icon">🔍</span> Поиск
+                </button>
+            </div>
+            <small class="team-search-hint">
+                Поиск по имени, фамилии или логину студента
+            </small>
+        </form>
+    </div>
+
+    {% if query %}
+        {% if students %}
+            <h3 class="team-search-results-title">Найдено студентов: {{ students.count }}</h3>
+            <div class="team-search-results">
+                {% for student in students %}
+                    <div class="card team-search-result-item">
+                        <div class="team-search-result-info">
+                            <strong class="team-search-result-name">{{ student.user.get_full_name|default:student.user.username }}</strong>
+                            <span class="team-search-result-username">@{{ student.user.username }}</span>
+                            {% if student.uni %}
+                                <span class="team-search-result-details">
+                                    {{ student.uni }}, {{ student.course }} курс
+                                </span>
+                            {% endif %}
+                        </div>
+                        <a href="{% url 'teams:invite_member' team.id student.id %}" class="btn btn-primary btn-small">
+                            <span class="btn-icon">➕</span> Пригласить
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="card empty-state">
+                <div class="empty-icon">😕</div>
+                <h3 class="empty-title">Никого не найдено</h3>
+                <p class="empty-text">По запросу "{{ query }}" ничего не найдено</p>
+                <p class="empty-hint">Попробуйте другой поисковый запрос</p>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="card empty-state">
+            <div class="empty-icon">🔍</div>
+            <h3 class="empty-title">Поиск студентов</h3>
+            <p class="empty-text">Введите имя или логин студента для поиска</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

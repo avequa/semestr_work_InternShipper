@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Редактирование профиля{% endblock %}
+
+{% block content %}
+<div class="student-form-container">
+    <div class="student-form-header">
+        <h1 class="student-form-title">Редактирование профиля</h1>
+        <a href="{% url 'student_profile' %}" class="btn btn-outline">
+            <span class="btn-icon">←</span> Назад
+        </a>
+    </div>
+
+    <div class="card student-form-card">
+        <form method="post" enctype="multipart/form-data" class="student-edit-form">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="error-message">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            {% if profile.ava %}
+                <div class="student-current-avatar">
+                    <img src="{{ profile.ava.url }}" alt="Текущий аватар" class="student-avatar-preview">
+                    <p class="student-avatar-hint">Текущий аватар</p>
+                </div>
+            {% endif %}
+
+            <div class="student-form-group">
+                <label for="{{ form.ava.id_for_label }}">Аватар</label>
+                {{ form.ava }}
+                {% if form.ava.errors %}
+                    <div class="student-field-error">{{ form.ava.errors }}</div>
+                {% endif %}
+                <small class="student-field-hint">Рекомендуемый размер: 200x200 пикселей</small>
+            </div>
+
+            <div class="student-form-group">
+                <label for="{{ form.uni.id_for_label }}">Университет</label>
+                {{ form.uni }}
+                {% if form.uni.errors %}
+                    <div class="student-field-error">{{ form.uni.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="student-form-group">
+                <label for="{{ form.course.id_for_label }}">Курс</label>
+                {{ form.course }}
+                {% if form.course.errors %}
+                    <div class="student-field-error">{{ form.course.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="student-form-group">
+                <label for="{{ form.speciality.id_for_label }}">Специальность</label>
+                {{ form.speciality }}
+                {% if form.speciality.errors %}
+                    <div class="student-field-error">{{ form.speciality.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="student-form-group">
+                <label for="{{ form.info.id_for_label }}">О себе</label>
+                {{ form.info }}
+                {% if form.info.errors %}
+                    <div class="student-field-error">{{ form.info.errors }}</div>
+                {% endif %}
+                <small class="student-field-hint">Расскажите о своих навыках, интересах и ожиданиях от проектов</small>
+            </div>
+
+            <div class="student-form-actions">
+                <button type="submit" class="btn btn-primary btn-large">
+                    <span class="btn-icon">💾</span> Сохранить изменения
+                </button>
+                <a href="{% url 'student_profile' %}" class="btn btn-outline">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-header">
+        <h1 class="form-title">{{ title }}</h1>
+        <a href="{% url 'partner_projects' %}" class="btn btn-outline">
+            <span class="btn-icon">←</span> Назад к проектам
+        </a>
+    </div>
+
+    <div class="card form-card">
+        <form method="post" class="project-form">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="error-message">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <div class="form-group">
+                <label for="{{ form.title.id_for_label }}">Название проекта *</label>
+                {{ form.title }}
+                {% if form.title.errors %}
+                    <div class="field-error">{{ form.title.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.description.id_for_label }}">Описание *</label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                    <div class="field-error">{{ form.description.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.requirements.id_for_label }}">Требования</label>
+                {{ form.requirements }}
+                {% if form.requirements.errors %}
+                    <div class="field-error">{{ form.requirements.errors }}</div>
+                {% endif %}
+                <small class="field-hint">Опишите требования к участникам проекта</small>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.deadline.id_for_label }}">Дедлайн *</label>
+                    {{ form.deadline }}
+                    {% if form.deadline.errors %}
+                        <div class="field-error">{{ form.deadline.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.max_team_members.id_for_label }}">Макс. участников *</label>
+                    {{ form.max_team_members }}
+                    {% if form.max_team_members.errors %}
+                        <div class="field-error">{{ form.max_team_members.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-group form-checkbox">
+                <label for="{{ form.is_active.id_for_label }}">
+                    {{ form.is_active }} Активен
+                </label>
+                {% if form.is_active.errors %}
+                    <div class="field-error">{{ form.is_active.errors }}</div>
+                {% endif %}
+                <small class="field-hint">Неактивные проекты не видны студентам</small>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-large">
+                    <span class="btn-icon">💾</span> Сохранить проект
+                </button>
+                <a href="{% url 'partner_projects' %}" class="btn btn-outline">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

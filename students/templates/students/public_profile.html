@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Профиль — {{ profile.user.get_full_name|default:profile.user.username }}{% endblock %}
+
+{% block content %}
+<div class="student-profile-container">
+    <div class="student-profile-header">
+        <h1 class="student-profile-title">Профиль студента</h1>
+        <a href="javascript:history.back()" class="btn btn-outline">
+            <span class="btn-icon">←</span> Назад
+        </a>
+    </div>
+
+    <div class="card student-profile-card">
+        <div class="student-avatar-wrapper">
+            {% if profile.ava %}
+                <img src="{{ profile.ava.url }}" alt="Аватар" class="student-avatar">
+            {% else %}
+                <div class="student-avatar-placeholder"><span>👤</span></div>
+            {% endif %}
+        </div>
+        <h2 class="student-profile-fullname">{{ profile.user.get_full_name|default:profile.user.username }}</h2>
+        <p class="student-profile-username">@{{ profile.user.username }}</p>
+        <p class="student-profile-email">{{ profile.user.email }}</p>
+    </div>
+
+    <div class="card student-info-card">
+        <h3 class="student-card-title">
+            <span class="student-card-icon">📚</span>
+            Образование
+        </h3>
+        <div class="student-info-grid">
+            <div class="student-info-item">
+                <label class="student-info-label">Университет:</label>
+                <p class="student-info-value">{{ profile.uni|default:"Не указан" }}</p>
+            </div>
+            <div class="student-info-item">
+                <label class="student-info-label">Курс:</label>
+                <p class="student-info-value">{{ profile.course|default:"Не указан" }}</p>
+            </div>
+            <div class="student-info-item">
+                <label class="student-info-label">Специальность:</label>
+                <p class="student-info-value">{{ profile.speciality|default:"Не указана" }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card student-about-card">
+        <h3 class="student-card-title">
+            <span class="student-card-icon">ℹ️</span>
+            О себе
+        </h3>
+        <p class="student-about-text">{{ profile.info|default:"Пользователь ничего не рассказал о себе" }}</p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Удаление аккаунта{% endblock %}
+
+{% block content %}
+<div class="delete-container">
+    <div class="card delete-card">
+        <div class="delete-icon">⚠️</div>
+
+        <h1 class="delete-title">Удаление аккаунта</h1>
+
+        <p class="delete-message">
+            Вы уверены, что хотите удалить свой аккаунт?
+        </p>
+
+        <div class="delete-warning">
+            <p>
+                <strong>⚠️ Это действие НЕЛЬЗЯ будет отменить!</strong><br>
+                Все ваши данные, включая профиль и информацию о проектах, будут безвозвратно удалены.
+            </p>
+        </div>
+
+        <form method="post" class="delete-actions">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger btn-large">
+                <span class="btn-icon">🗑️</span> Да, удалить мой аккаунт
+            </button>
+            <a href="{% url 'student_profile' %}" class="btn btn-outline btn-large">
+                <span class="btn-icon">❌</span> Отмена
+            </a>
+        </form>
+    </div>
+</div>
+{% endblock %}

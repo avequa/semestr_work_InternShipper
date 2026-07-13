@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load socialaccount %}
+
+{% block title %}Регистрация{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1 class="auth-title">Регистрация</h1>
+            <p class="auth-subtitle">Создайте новый аккаунт</p>
+        </div>
+
+        {% if form.errors %}
+            <div class="error-message">
+                <span class="error-icon">⚠️</span>
+                <span>Пожалуйста, проверьте введённые данные.</span>
+            </div>
+        {% endif %}
+
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label>Имя пользователя</label>
+                <input type="text" name="username" placeholder="Придумайте логин" required>
+                {% if form.username.errors %}
+                    <div class="field-error">{{ form.username.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" placeholder="example@mail.ru" required>
+                {% if form.email.errors %}
+                    <div class="field-error">{{ form.email.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label>Пароль</label>
+                <input type="password" name="password" placeholder="Минимум 8 символов" required>
+                {% if form.password.errors %}
+                    <div class="field-error">{{ form.password.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label>Роль</label>
+                <select name="role">
+                    <option value="student">Студент</option>
+                    <option value="partner">Партнёр</option>
+                </select>
+                {% if form.role.errors %}
+                    <div class="field-error">{{ form.role.errors }}</div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                Зарегистрироваться
+            </button>
+        </form>
+
+        <hr style="margin: 25px 0;">
+        <p style="text-align:center; margin-bottom: 10px;">Или зарегистрируйтесь через</p>
+
+        <a href="{% provider_login_url 'github' %}"
+           style="display:block; text-align:center; background:#24292e; color:white;
+                  padding:10px; border-radius:6px; text-decoration:none; font-weight:600;">
+            Войти через GitHub
+        </a>
+        <a href="{% provider_login_url 'google' %}"
+           style="display:block; text-align:center; background:#4285f4; color:white; padding:10px; border-radius:6px; text-decoration:none; font-weight:600; margin-top:10px;">
+            Войти через Google
+        </a>
+
+        <div class="auth-footer" style="margin-top:20px;">
+            Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

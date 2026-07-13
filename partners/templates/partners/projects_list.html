@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <h1>Мои проекты</h1>
+        <!-- ВАЖНО: Используем URL из приложения projects! -->
+        <a href="{% url 'project_create' %}" class="btn btn-primary">➕ Создать проект</a>
+    </div>
+
+    {% if projects %}
+        <div class="projects-grid">
+            {% for project in projects %}
+                <div class="card">
+                    {% if project.preview %}
+                        <img src="{{ project.preview.url }}" alt="{{ project.title }}" style="max-width: 100%;">
+                    {% endif %}
+
+                    <h2>{{ project.title }}</h2>
+                    <p>{{ project.description|truncatechars:150 }}</p>
+                    <p><strong>Дедлайн:</strong> {{ project.deadline|date:"d.m.Y H:i" }}</p>
+                    <p><strong>Статус:</strong>
+                        {% if project.is_active %}
+                            <span style="color: green;">Активен</span>
+                        {% else %}
+                            <span style="color: gray;">Неактивен</span>
+                        {% endif %}
+                    </p>
+
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <a href="{% url 'project_detail' project.pk %}" class="btn btn-primary">Просмотр</a>
+                        <a href="{% url 'project_update' project.pk %}" class="btn">✏️ Редактировать</a>
+                        <a href="{% url 'project_delete' project.pk %}" class="btn">🗑️ Удалить</a>
+                        <a href="{% url 'project_applications' project.pk %}" class="btn">👥 Заявки</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card" style="text-align: center; padding: 60px;">
+            <h3>У вас пока нет проектов</h3>
+            <p>Создайте свой первый проект и начните получать заявки от студентов!</p>
+            <a href="{% url 'project_create' %}" class="btn btn-primary" style="margin-top: 20px;">
+                ➕ Создать первый проект
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

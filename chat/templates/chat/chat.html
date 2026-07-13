@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}Чат — {{ chat_title }}{% endblock %}
+
+{% block content %}
+<div class="chat-container" data-conversation-id="{{ conversation.id }}">
+    <div class="chat-header">
+        <a href="{% url 'project_detail' application.project.pk %}" class="back-link">← К проекту</a>
+        <h1 class="chat-title">
+            {% if is_team_chat %}<span class="btn-icon">👥</span> {% endif %}Чат: {{ chat_title }}
+        </h1>
+        <p class="chat-subtitle">Проект: {{ application.project.title }}</p>
+    </div>
+
+    <div class="card chat-card">
+        <div id="chat-log" class="chat-log">
+            <p class="chat-empty" id="chat-empty">Сообщений пока нет. Напишите первым!</p>
+        </div>
+
+        <div class="chat-input-row">
+            <input id="chat-message-input" type="text" class="chat-input"
+                   placeholder="Введите сообщение..." autocomplete="off">
+            <button id="chat-message-submit" class="btn btn-primary">
+                <span class="btn-icon">➤</span> Отправить
+            </button>
+        </div>
+        <p id="chat-status" class="chat-status"></p>
+    </div>
+</div>
+
+<script>
+(function () {
+    const container = document.querySelector('.chat-container');
+    const conversationId = container.dataset.conversationId;
+    const currentUserId = {{ request.user.id }};
+
+    const log = document.querySelector('#chat-log');
+    const emptyHint = document.querySelector('#chat-empty');
+    const input = document.querySelector('#chat-message-input');
+    const sendBtn = document.querySelector('#chat-message-submit');
+    const status = document.querySelector('#chat-status');
+
+    const scheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const socket = new WebSocket(
+        scheme + '://' + window.location.host + '/ws/chat/' + conversationId + '/'
+    );
+
+    function escapeHtml(s) {
+        const d = document.createElement('div');
+        d.textContent = s;
+        return d.innerHTML;
+    }
+
+    function addMessage(msg) {
+        if (emptyHint) { emptyHint.remove(); }
+        const isMine = msg.sender_id === currentUserId;
+        const wrap = document.createElement('div');
+        wrap.className = 'chat-message ' + (isMine ? 'chat-message-mine' : 'chat-message-theirs');
+        wrap.innerHTML =
+            '<div class="chat-bubble">' +
+                (isMine ? '' : '<span class="chat-sender">' + escapeHtml(msg.sender) + '</span>') +
+                '<span class="chat-text">' + escapeHtml(msg.text) + '</span>' +
+                '<span class="chat-time">' + escapeHtml(msg.created_at) + '</span>' +
+            '</div>';
+        log.appendChild(wrap);
+        log.scrollTop = log.scrollHeight;
+    }
+
+    socket.onmessage = function (e) {
+        const data = JSON.parse(e.data);
+        if (data.type === 'history') {
+            data.messages.forEach(addMessage);
+        } else if (data.type === 'message') {
+            addMessage(data.message);
+        }
+    };
+
+    socket.onopen = function () { status.textContent = ''; };
+    socket.onclose = function () { status.textContent = 'Соединение прервано. Обновите страницу.'; };
+
+    function send() {
+        const text = input.value.trim();
+        if (!text || socket.readyState !== WebSocket.OPEN) { return; }
+        socket.send(JSON.stringify({ message: text }));
+        input.value = '';
+        input.focus();
+    }
+
+    sendBtn.onclick = send;
+    input.onkeyup = function (e) { if (e.key === 'Enter') { send(); } };
+})();
+</script>
+{% endblock %}

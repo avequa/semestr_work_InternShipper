@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Редактирование профиля партнера{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-header">
+        <h1 class="form-title">Редактирование профиля</h1>
+        <a href="{% url 'partner_profile' %}" class="btn btn-outline">
+            <span class="btn-icon">←</span> Назад
+        </a>
+    </div>
+
+    <div class="card form-card">
+        <form method="post" enctype="multipart/form-data" class="profile-form">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="error-message">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            {% if profile.logo %}
+                <div class="current-logo">
+                    <img src="{{ profile.logo.url }}" alt="Логотип" class="logo-preview">
+                    <p class="logo-hint">Текущий логотип</p>
+                </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label for="{{ form.logo.id_for_label }}">Логотип</label>
+                {{ form.logo }}
+                {% if form.logo.errors %}
+                    <div class="field-error">{{ form.logo.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.company_name.id_for_label }}">Название компании *</label>
+                {{ form.company_name }}
+                {% if form.company_name.errors %}
+                    <div class="field-error">{{ form.company_name.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.position.id_for_label }}">Должность</label>
+                {{ form.position }}
+                {% if form.position.errors %}
+                    <div class="field-error">{{ form.position.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.phone.id_for_label }}">Телефон</label>
+                {{ form.phone }}
+                {% if form.phone.errors %}
+                    <div class="field-error">{{ form.phone.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.website.id_for_label }}">Сайт компании</label>
+                {{ form.website }}
+                {% if form.website.errors %}
+                    <div class="field-error">{{ form.website.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-large">
+                    <span class="btn-icon">💾</span> Сохранить изменения
+                </button>
+                <a href="{% url 'partner_profile' %}" class="btn btn-outline">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

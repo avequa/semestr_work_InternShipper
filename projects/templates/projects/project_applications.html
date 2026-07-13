@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}Заявки на проект {{ project.title }}{% endblock %}
+
+{% block content %}
+<div class="applications-container">
+    <div class="applications-header">
+        <div>
+            <a href="{% url 'project_list' %}" class="back-link">← Назад к проектам</a>
+            <h1 class="applications-title">Заявки на проект</h1>
+            <h2 class="applications-subtitle">{{ project.title }}</h2>
+        </div>
+        <div>
+            <span class="status-badge status-{{ project.is_active|yesno:'active,inactive' }}">
+                {{ project.is_active|yesno:"Активен,Неактивен" }}
+            </span>
+        </div>
+    </div>
+
+    {% if applications %}
+        <div class="applications-list">
+            {% for application in applications %}
+                <div class="card application-item">
+                    <div class="application-header">
+                        <h3 class="application-team">
+                            {% if application.team %}
+                                👥 {{ application.team.name }}
+                            {% else %}
+                                👤 Соло-заявка
+                            {% endif %}
+                        </h3>
+                        <span class="status-badge status-{{ application.status }}">
+                            {{ application.get_status_display }}
+                        </span>
+                    </div>
+
+                    <p class="application-date">
+                        Подана: {{ application.applied_at|date:"d.m.Y H:i" }}
+                    </p>
+
+                    {% if application.student %}
+                        <div class="applicant-card">
+                            <div class="applicant-info">
+                                <strong class="applicant-name">
+                                    {{ application.student.user.get_full_name|default:application.student.user.username }}
+                                </strong>
+                                <span class="applicant-meta">
+                                    {% if application.student.uni %}{{ application.student.uni }}{% endif %}
+                                    {% if application.student.course %}, {{ application.student.course }} курс{% endif %}
+                                </span>
+                                {% if application.student.speciality %}
+                                    <span class="applicant-meta">{{ application.student.speciality }}</span>
+                                {% endif %}
+                            </div>
+                            <a href="{% url 'student_public_profile' application.student.id %}"
+                               class="btn btn-outline btn-small">
+                                <span class="btn-icon">👁️</span> Профиль
+                            </a>
+                        </div>
+
+                    {% elif application.team %}
+                        <p class="applicant-captain">
+                            <strong>Капитан:</strong>
+                            {{ application.team.captain.user.get_full_name|default:application.team.captain.user.username }}
+                        </p>
+                        <div class="applicant-members">
+                            <p class="applicant-members-title">Участники команды:</p>
+                            {% for member in application.member_list %}
+                                <div class="applicant-card">
+                                    <div class="applicant-info">
+                                        <strong class="applicant-name">
+                                            {{ member.student.user.get_full_name|default:member.student.user.username }}
+                                            {% if member.student == application.team.captain %}
+                                                <span class="captain-mark">👑</span>
+                                            {% endif %}
+                                        </strong>
+                                        <span class="applicant-meta">
+                                            {% if member.student.uni %}{{ member.student.uni }}{% endif %}
+                                            {% if member.student.course %}, {{ member.student.course }} курс{% endif %}
+                                        </span>
+                                    </div>
+                                    <a href="{% url 'student_public_profile' member.student.id %}"
+                                       class="btn btn-outline btn-small">
+                                        <span class="btn-icon">👁️</span> Профиль
+                                    </a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="application-actions">
+                        <form method="post" action="{% url 'update_application_status' project.pk application.pk %}" class="status-form">
+                            {% csrf_token %}
+                            {% if application.status == 'pending' %}
+                                <button type="submit" name="status" value="approved" class="btn btn-success btn-small">
+                                    ✓ Одобрить
+                                </button>
+                                <button type="submit" name="status" value="rejected" class="btn btn-danger btn-small">
+                                    ✗ Отклонить
+                                </button>
+                            {% elif application.status == 'approved' %}
+                                <button type="submit" name="status" value="rejected" class="btn btn-danger btn-small">
+                                    ✗ Отменить одобрение
+                                </button>
+                            {% elif application.status == 'rejected' %}
+                                <button type="submit" name="status" value="approved" class="btn btn-success btn-small">
+                                    ✓ Одобрить
+                                </button>
+                            {% endif %}
+                            <button type="submit" name="status" value="pending" class="btn btn-outline btn-small">
+                                ⟳ На рассмотрение
+                            </button>
+                        </form>
+
+                        {% if application.status == 'approved' %}
+                            <a href="{% url 'chat:open_chat' application.id %}" class="btn btn-info btn-small chat-link">
+                                <span class="btn-icon">💬</span> Открыть чат
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card empty-state">
+            <div class="empty-icon">📭</div>
+            <h3 class="empty-title">Нет заявок</h3>
+            <p class="empty-text">На этот проект пока никто не подал заявку</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

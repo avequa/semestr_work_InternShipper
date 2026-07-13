@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Выйти из команды — {{ team.name }}{% endblock %}
+
+{% block content %}
+<div class="delete-container">
+    <div class="card delete-card">
+        <div class="delete-icon">👋</div>
+
+        <h1 class="delete-title">Выход из команды</h1>
+
+        <p class="delete-message">
+            Вы уверены, что хотите выйти из команды <strong>"{{ team.name }}"</strong>?
+        </p>
+
+        <div class="delete-warning">
+            <p>
+                Вы больше не сможете участвовать в проектах от этой команды.
+                {% if is_captain %}
+                    <strong>Вы являетесь капитаном!</strong> При выходе капитаном станет другой участник.
+                {% endif %}
+            </p>
+        </div>
+
+        <form method="post" class="delete-actions">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger btn-large">
+                <span class="btn-icon">🚪</span> Да, выйти
+            </button>
+            <a href="{% url 'teams:my_team' %}" class="btn btn-outline btn-large">
+                <span class="btn-icon">❌</span> Отмена
+            </a>
+        </form>
+    </div>
+</div>
+{% endblock %}

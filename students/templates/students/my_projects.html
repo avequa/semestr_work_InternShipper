@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Мои проекты{% endblock %}
+
+{% block content %}
+<div class="student-projects-container">
+    <div class="student-projects-header">
+        <h1 class="student-projects-title">Мои проекты</h1>
+        <div class="student-projects-header-actions">
+            <a href="{% url 'project_list' %}" class="btn btn-primary">
+                <span class="btn-icon">🔍</span> Найти проекты
+            </a>
+            <a href="{% url 'student_profile' %}" class="btn btn-outline">
+                <span class="btn-icon">👤</span> Мой профиль
+            </a>
+        </div>
+    </div>
+
+    {% if applications %}
+        <div class="student-projects-grid">
+            {% for application in applications %}
+                <div class="card student-project-card">
+                    {% if application.project.preview %}
+                        <img src="{{ application.project.preview.url }}" alt="{{ application.project.title }}" class="student-project-preview">
+                    {% endif %}
+
+                    <h2 class="student-project-title">{{ application.project.title }}</h2>
+                    <p class="student-project-description">{{ application.project.description|truncatewords:20 }}</p>
+
+                    <p class="student-project-company">
+                        <strong>Компания:</strong> {{ application.project.partner.company_name }}
+                    </p>
+
+                    <div class="student-project-badge-wrapper">
+                        {% if application.team %}
+                            <span class="student-project-badge student-project-badge-team">
+                                👥 Команда: {{ application.team.name }}
+                            </span>
+                        {% else %}
+                            <span class="student-project-badge student-project-badge-solo">
+                                👤 Соло-заявка
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <div class="student-project-footer">
+                        <span class="student-project-status status-{{ application.status }}">
+                            {{ application.get_status_display }}
+                        </span>
+                        <div class="student-project-footer-actions">
+                            {% if application.status == 'approved' %}
+                                <a href="{% url 'chat:open_chat' application.id %}" class="btn btn-success btn-small">
+                                    <span class="btn-icon">💬</span> Чат
+                                </a>
+                            {% endif %}
+                            <a href="{% url 'project_detail' application.project.pk %}" class="btn btn-info btn-small">
+                                Подробнее
+                            </a>
+                        </div>
+                    </div>
+
+                    <p class="student-project-deadline">
+                        <strong>Дедлайн:</strong> {{ application.project.deadline|date:"d.m.Y" }}
+                    </p>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card empty-state">
+            <div class="empty-icon">📭</div>
+            <h3 class="empty-title">У вас пока нет проектов</h3>
+            <p class="empty-text">Запишитесь на проект или создайте команду, чтобы начать работу!</p>
+            <div class="empty-actions">
+                <a href="{% url 'project_list' %}" class="btn btn-primary">Найти проекты</a>
+                <a href="{% url 'teams:my_team' %}" class="btn btn-outline">Моя команда</a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="welcome-container{% if not user.is_authenticated %} guest-bg{% endif %}">
+    <div class="welcome-card">
+        <h1 class="welcome-title">Добро пожаловать в InternShipper</h1>
+
+        {% if user.is_authenticated %}
+            <p class="welcome-greeting">
+                Привет, <strong class="username-highlight">{{ user.username }}</strong>!
+            </p>
+
+            <div class="welcome-actions">
+                <!-- Общая кнопка для всех -->
+                <a href="{% url 'project_list' %}" class="btn btn-primary">
+                    Смотреть проекты
+                </a>
+
+                <!-- partner -->
+                {% if user.partner_profile %}
+                    <a href="{% url 'project_create' %}" class="btn btn-primary">
+                        Создать проект
+                    </a>
+                    <a href="{% url 'partner_profile' %}" class="btn btn-secondary">
+                        Мой профиль партнера
+                    </a>
+                    <a href="{% url 'partner_projects' %}" class="btn btn-secondary">
+                        Мои проекты
+                    </a>
+                {% endif %}
+
+                <!-- student -->
+                {% if user.student_profile %}
+                    <a href="{% url 'student_profile' %}" class="btn btn-secondary">
+                        Мой профиль
+                    </a>
+                    <a href="{% url 'my_projects' %}" class="btn btn-secondary">
+                        Мои проекты
+                    </a>
+                {% endif %}
+
+                <a href="{% url 'logout' %}" class="btn btn-outline">
+                    Выйти
+                </a>
+            </div>
+
+        {% else %}
+            <p class="welcome-subtitle">
+                Биржа проектов для студентов и компаний
+            </p>
+
+            <div class="welcome-actions">
+                <a href="{% url 'login' %}" class="btn btn-primary">Войти</a>
+                <a href="{% url 'register' %}" class="btn btn-outline">Зарегистрироваться</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

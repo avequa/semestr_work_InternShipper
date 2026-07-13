@@ -1,0 +1,68 @@
+name: Django CI
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    # Поднимаем такие же сервисы, как в docker-compose.
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: internshipper_test
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: adminpassword
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Забираем код проекта
+        uses: actions/checkout@v4
+
+      - name: Устанавливаем Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: 'pip'
+
+      - name: Устанавливаем зависимости
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-django
+
+      - name: Запускаем pytest
+        env:
+          DJANGO_SETTINGS_MODULE: internshipper.settings
+          # Подключение к сервисам GitHub (имена переменных — как в settings.py).
+          POSTGRES_DB: internshipper_test
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: adminpassword
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: "5432"
+          # В CI отдельный Redis есть, но для тестов хватит in-memory слоя —
+          # это убирает зависимость тестов от сети и ускоряет прогон.
+          USE_REDIS_CHANNEL_LAYER: "False"
+          REDIS_HOST: localhost
+          REDIS_PORT: "6379"
+          SECRET_KEY: "ci-test-secret-key"
+          DEBUG: "False"
+          ALLOWED_HOSTS: "localhost,127.0.0.1,testserver"
+        run: |
+          pytest -v

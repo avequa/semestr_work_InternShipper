@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Нет команды{% endblock %}
+
+{% block content %}
+<div class="empty-state-container">
+    <div class="card empty-state-card">
+        <div class="empty-icon">👥</div>
+        <h2 class="empty-title">У вас нет команды</h2>
+        <p class="empty-text">Создайте свою команду, чтобы работать над проектами вместе с другими студентами!</p>
+        <div class="empty-actions">
+            <a href="{% url 'teams:create_team' %}" class="btn btn-primary btn-large">
+                <span class="btn-icon">🚀</span> Создать команду
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

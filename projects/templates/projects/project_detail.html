@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ project.title }}{% endblock %}
+
+{% block content %}
+<div class="project-detail-container">
+    <div class="project-detail-header">
+        <a href="{% url 'project_list' %}" class="back-link">← Назад к проектам</a>
+    </div>
+
+    <div class="card project-detail-card">
+        {% if project.preview %}
+            <img src="{{ project.preview.url }}" alt="{{ project.title }}" class="project-detail-preview">
+        {% endif %}
+
+        <div class="project-detail-title-wrapper">
+            <h1 class="project-detail-title">{{ project.title }}</h1>
+            {% if user.student_profile %}
+                <a href="{% url 'toggle_favorite' project.id %}"
+                   class="favorite-btn favorite-btn-large {% if project.id in request.session.favorites %}favorite-btn-active{% endif %}"
+                   title="{% if project.id in request.session.favorites %}Убрать из избранного{% else %}Добавить в избранное{% endif %}">
+                    <span>⭐</span>
+                </a>
+            {% endif %}
+        </div>
+
+        <div class="project-detail-meta">
+            <span class="project-detail-company">
+                <strong>Компания:</strong> {{ project.partner.company_name }}
+            </span>
+            <span class="project-detail-deadline">
+                <strong>Дедлайн:</strong> {{ project.deadline|date:"d.m.Y H:i" }}
+            </span>
+            <span class="project-detail-teams">
+                <strong>Макс. команд:</strong> {{ project.max_teams }}
+            </span>
+        </div>
+
+        <div class="project-detail-description">
+            <h3 class="project-detail-section-title">Описание</h3>
+            <div class="project-detail-content">
+                {{ project.description|linebreaks }}
+            </div>
+        </div>
+
+        {% if project.requirements %}
+            <div class="project-detail-requirements">
+                <h3 class="project-detail-section-title">Требования</h3>
+                <div class="project-detail-content">
+                    {{ project.requirements|linebreaks }}
+                </div>
+            </div>
+        {% endif %}
+
+        {# ---------- Блок подачи заявки (студент) ---------- #}
+        {% if user.student_profile %}
+            <div class="apply-box">
+                <h3 class="project-detail-section-title">Подать заявку</h3>
+
+                {% if can_apply_solo or captain_teams %}
+                    <div class="apply-options">
+                        {% if can_apply_solo %}
+                            <form method="post" action="{% url 'apply_to_project' project.id %}" class="apply-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="apply_type" value="solo">
+                                <button type="submit" class="btn btn-primary">
+                                    <span class="btn-icon">👤</span> Подать соло-заявку
+                                </button>
+                            </form>
+                        {% endif %}
+
+                        {% for team in captain_teams %}
+                            <form method="post" action="{% url 'apply_to_project' project.id %}" class="apply-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="apply_type" value="team">
+                                <input type="hidden" name="team_id" value="{{ team.id }}">
+                                <button type="submit" class="btn btn-secondary">
+                                    <span class="btn-icon">👥</span> От команды «{{ team.name }}»
+                                </button>
+                            </form>
+                        {% endfor %}
+                    </div>
+                    {% if captain_teams %}
+                        <p class="apply-hint">Вы капитан — можете подать заявку от лица своей команды.</p>
+                    {% endif %}
+                {% else %}
+                    <p class="apply-hint">Вы уже подали заявку на этот проект (соло и от своих команд).</p>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        {# ---------- Действия партнёра-владельца ---------- #}
+        {% if user.partner_profile and project.partner == user.partner_profile %}
+            <div class="project-detail-actions">
+                <a href="{% url 'project_update' project.pk %}" class="btn btn-outline">
+                    <span class="btn-icon">✏️</span> Редактировать
+                </a>
+                <a href="{% url 'project_delete' project.pk %}" class="btn btn-danger">
+                    <span class="btn-icon">🗑️</span> Удалить
+                </a>
+                <a href="{% url 'project_applications' project.pk %}" class="btn btn-info">
+                    <span class="btn-icon">👥</span> Заявки
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

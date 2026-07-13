@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Создать команду{% endblock %}
+
+{% block content %}
+<div class="team-form-container">
+    <div class="team-form-header">
+        <h1 class="team-form-title">Создать команду</h1>
+        <p class="team-form-subtitle">Соберите свою команду для работы над проектами</p>
+    </div>
+
+    <div class="card team-form-card">
+        <form method="post" class="team-form">
+            {% csrf_token %}
+
+            <div class="team-form-group">
+                <label for="name">Название команды *</label>
+                <input type="text" name="name" id="name" required class="team-input" placeholder="Введите название">
+            </div>
+
+            <div class="team-form-group">
+                <label for="description">Описание</label>
+                <textarea name="description" id="description" rows="3" class="team-textarea" placeholder="Расскажите о вашей команде, целях и интересах"></textarea>
+            </div>
+
+            <div class="team-form-actions">
+                <button type="submit" class="btn btn-primary btn-large">
+                    <span class="btn-icon">🚀</span> Создать
+                </button>
+                <a href="{% url 'teams:my_team' %}" class="btn btn-outline">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
