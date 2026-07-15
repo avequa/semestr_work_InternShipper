@@ -40,12 +40,6 @@
 Настройки БД и Redis зашиты в `docker-compose.yml` - трогать не нужно
 В `.env` выносятся только секреты (SMTP и OAuth)
 
-собрать проект
-`docker compose up --build` 
-
-очистить контейнеры 
-`docker compose down -v`
-
 ## Автозаполнение БД
 
 заполнить
